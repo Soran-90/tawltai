@@ -1,16 +1,13 @@
 import { db } from "./firebase.js";
 import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
-// Safety checks (prevents blank UI)
-if (typeof window.MOCK_EVENTS === "undefined") {
-  alert("data.js not loaded (MOCK_EVENTS missing). Check event.html script order.");
-}
-if (typeof window.applyI18n !== "function") {
-  alert("i18n.js not loaded (applyI18n missing). Check event.html script order.");
-}
+// === helpers to access globals loaded by defer scripts ===
+const applyI18n = (...a) => globalThis.applyI18n?.(...a);
+const t = (k) => globalThis.t ? globalThis.t(k) : k;
+const getLang = () => globalThis.getLang ? globalThis.getLang() : "ar";
 
 function getQueryParam(name) {
-  const url = new URL(window.location.href);
+  const url = new URL(globalThis.location.href);
   return url.searchParams.get(name);
 }
 
@@ -29,7 +26,7 @@ function pickDesc(ev) {
 }
 
 function usdToIqd(usd) {
-  const rate = (window.APP_SETTINGS && window.APP_SETTINGS.usdToIqd) ? window.APP_SETTINGS.usdToIqd : 1310;
+  const rate = (globalThis.APP_SETTINGS && globalThis.APP_SETTINGS.usdToIqd) ? globalThis.APP_SETTINGS.usdToIqd : 1310;
   return Math.round(Number(usd || 0) * rate);
 }
 function moneyUSD(n) { return `$${Number(n || 0).toFixed(2)}`; }
@@ -59,6 +56,8 @@ function makeCode() {
 
 function renderEvent(ev) {
   const wrap = document.getElementById("eventWrap");
+  if (!wrap) return;
+
   wrap.innerHTML = `
     <div class="card">
       <div class="thumb" style="width:100%; height:220px; background-image:url('${ev.img}')"></div>
@@ -137,7 +136,7 @@ function setupBooking(ev) {
     try {
       await setDoc(doc(db, "bookings", bookingId), bookingDoc);
 
-      // مؤقتًا حتى "حجوزاتي" تبقى شغالة بدون نظام حسابات:
+      // مؤقتًا (بدون حسابات): نخزن محلي حتى تظهر بـ "حجوزاتي"
       const local = JSON.parse(localStorage.getItem("bookings") || "[]");
       local.unshift({
         id: bookingId,
@@ -154,7 +153,7 @@ function setupBooking(ev) {
       });
       localStorage.setItem("bookings", JSON.stringify(local));
 
-      window.location.href = `booking.html?id=${encodeURIComponent(bookingId)}&v=1`;
+      globalThis.location.href = `booking.html?id=${encodeURIComponent(bookingId)}&v=1`;
     } catch (e) {
       alert("Firebase error: " + (e?.message || e));
       confirmBtn.disabled = false;
@@ -168,13 +167,18 @@ document.addEventListener("DOMContentLoaded", () => {
   applyI18n();
 
   const id = getQueryParam("id");
-  const ev = (window.MOCK_EVENTS || []).find(x => x.id === id);
-  if (!ev) return;
+  const events = globalThis.MOCK_EVENTS || [];
+  const ev = events.find(x => x.id === id);
+
+  if (!ev) {
+    alert("Event not found. Check data.js / id param.");
+    return;
+  }
 
   renderEvent(ev);
   setupBooking(ev);
 
-  if (window.location.hash === "#book") {
+  if (globalThis.location.hash === "#book") {
     document.getElementById("book")?.scrollIntoView({ behavior: "smooth" });
   }
 });
