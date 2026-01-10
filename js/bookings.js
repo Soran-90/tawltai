@@ -1,3 +1,4 @@
+console.log("Rate:", window.APP_SETTINGS?.usdToIqd);
 function formatMoneyUSD(x) {
   const n = Number(x || 0);
   return `$${n.toFixed(2)}`;
