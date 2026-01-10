@@ -25,5 +25,11 @@ window.LANG_EN = {
   continue: "Continue",
     total: "Total",
   pay: "Pay",
-
+  no_bookings: "You have no bookings yet",
+  status: "Status",
+  type: "Type",
+  people: "People",
+  pay: "Pay",
+  currency_usd: "USD",
+  currency_iqd: "IQD",
 };
