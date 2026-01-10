@@ -43,17 +43,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // النص الذي يدخل داخل QR
   // مبدئيًا: كود + ID + معلومات مختصرة
-  const qrText = `${location.origin}${location.pathname.replace("booking.html","check.html")}?id=${encodeURIComponent(b.id)}&code=${encodeURIComponent(b.code)}`;
-    app: "tawltai",
-    bookingId: b.id,
-    code: b.code,
-    eventId: b.eventId,
-    venue: b.venue,
-    date: b.date,
-    time: b.time,
-    people: b.people,
-    totalUSD: b.finalTotalUSD,
-  });
+  const base = location.origin + location.pathname.replace("booking.html", "");
+const qrText = `${base}check.html?id=${encodeURIComponent(b.id)}&code=${encodeURIComponent(b.code)}`;
 
   wrap.innerHTML = `
     <div class="card">
