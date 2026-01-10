@@ -32,4 +32,8 @@ window.LANG_KU = {
   pay: "پارە",
   currency_usd: "USD",
   currency_iqd: "IQD",
+    total: "کۆی گشتی",
+  discount: "داشکان",
+  final_pay: "پارەی داواکراو",
+
 };
