@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>طاولتي</title>
+  <link rel="stylesheet" href="css/app.css" />
+  <script defer src="lang/ar.js"></script>
+  <script defer src="lang/ku.js"></script>
+  <script defer src="lang/en.js"></script>
+  <script defer src="js/i18n.js"></script>
+  <script defer src="js/data.js"></script>
+  <script defer src="js/app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo"></div>
+      <div>
+        <div class="appname" data-i18n="app_name"></div>
+        <div class="city"><span data-i18n="city"></span></div>
+      </div>
+    </div>
+
+    <div class="lang">
+      <button class="chip" onclick="setLang('ar')">AR</button>
+      <button class="chip" onclick="setLang('ku')">KU</button>
+      <button class="chip" onclick="setLang('en')">EN</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="filters">
+      <button class="chip active" data-filter="today" data-i18n="today"></button>
+      <button class="chip" data-filter="week" data-i18n="week"></button>
+      <button class="chip" data-filter="concerts" data-i18n="concerts"></button>
+      <button class="chip" data-filter="nightclubs" data-i18n="nightclubs"></button>
+    </div>
+
+    <input class="search" id="searchInput" data-i18n-placeholder="search_placeholder" />
+
+    <div id="eventsList" class="cards"></div>
+  </main>
+
+  <nav class="bottomnav">
+    <a class="navitem active" href="index.html">🏠 <span data-i18n="events"></span></a>
+    <a class="navitem" href="my-bookings.html">🎟️ <span data-i18n="my_bookings"></span></a>
+  </nav>
+</body>
+</html>
