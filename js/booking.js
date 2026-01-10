@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // النص الذي يدخل داخل QR
   // مبدئيًا: كود + ID + معلومات مختصرة
-  const qrText = JSON.stringify({
+  const qrText = `${location.origin}${location.pathname.replace("booking.html","check.html")}?id=${encodeURIComponent(b.id)}&code=${encodeURIComponent(b.code)}`;
     app: "tawltai",
     bookingId: b.id,
     code: b.code,
