@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tawltai - Venue Dashboard</title>
+  <link rel="stylesheet" href="css/app.css" />
+
+  <script defer src="lang/ar.js"></script>
+  <script defer src="lang/ku.js"></script>
+  <script defer src="lang/en.js"></script>
+
+  <script defer src="js/i18n.js"></script>
+  <script defer src="js/settings.js"></script>
+  <script type="module" src="js/venue.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo"></div>
+      <div>
+        <div class="appname">Tawltai</div>
+        <div class="city">Venue Dashboard</div>
+      </div>
+    </div>
+
+    <div class="lang">
+      <button class="chip" onclick="setLang('ar')">AR</button>
+      <button class="chip" onclick="setLang('ku')">KU</button>
+      <button class="chip" onclick="setLang('en')">EN</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="card">
+      <div class="content" style="width:100%;">
+        <div class="row">
+          <div class="title">🏢 Venue</div>
+        </div>
+
+        <div class="meta" style="margin-top:6px;">اختر القاعة/المكان (مؤقتًا يدوي)</div>
+
+        <select id="venueSelect" class="search" style="margin-top:10px;">
+          <option value="Sky Club">Sky Club</option>
+          <option value="Divan Erbil">Divan Erbil</option>
+        </select>
+
+        <div class="filters" style="margin-top:10px;">
+          <button class="chip active" data-filter="all">All</button>
+          <button class="chip" data-filter="today">Today</button>
+          <button class="chip" data-filte
