@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   root.innerHTML = list.map(b => `
-    <div class="card">
+    <a class="card" href="booking.html?id=${encodeURIComponent(b.id)}" style="text-decoration:none; color:inherit;">
       <div class="content" style="width:100%;">
         <div class="row">
           <div class="title">${b.title}</div>
@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         <div class="meta">
           ${t("type")}: ${typeLabel(b.bookingType)} • ${t("people")}: ${b.people}
-        </div>
+        </a>
 
         <div class="price" style="margin-top:8px;">
           ${t("pay")}: ${formatMoneyUSD(b.finalTotalUSD)} (${formatMoneyIQDFromUSD(b.finalTotalUSD)})
