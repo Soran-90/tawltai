@@ -106,9 +106,17 @@ function setupBooking(ev) {
   confirmBtn.addEventListener("click", () => {
     const people = Math.max(1, Number(peopleInput.value || 1));
     const price = calcPrice(ev, bookingType, people);
+    function makeCode() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let out = "TAW-";
+  for (let i = 0; i < 5; i++) out += chars[Math.floor(Math.random() * chars.length)];
+  return out;
+}
+const code = makeCode();
 
     const booking = {
       id: "b_" + Date.now(),
+      code,
       eventId: ev.id,
       title: pickTitle(ev),
       venue: ev.venue,
