@@ -32,5 +32,7 @@ window.LANG_AR = {
   pay: "المبلغ",
   currency_usd: "دولار",
   currency_iqd: "دينار",
-
+    total: "المجموع",
+  discount: "الخصم",
+  final_pay: "المبلغ للدفع",
 };
