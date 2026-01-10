@@ -20,8 +20,6 @@ function pickTitleFromDoc(d) {
   return d.title_en || d.title_ar || d.title_ku || "Event";
 }
 
-function render(wrap, html) { wrap.innerHTML = html; }
-
 document.addEventListener("DOMContentLoaded", async () => {
   applyI18n();
 
@@ -30,7 +28,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const code = getQueryParam("code");
 
   if (!id || !code) {
-    render(wrap, `<div class="card"><div class="content">❌ Missing QR parameters</div></div>`);
+    wrap.innerHTML = `<div class="card"><div class="content">❌ Missing QR parameters</div></div>`;
     return;
   }
 
@@ -38,14 +36,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   const snap = await getDoc(ref);
 
   if (!snap.exists()) {
-    render(wrap, `<div class="card"><div class="content">❌ Booking not found</div></div>`);
+    wrap.innerHTML = `<div class="card"><div class="content">❌ Booking not found</div></div>`;
     return;
   }
 
   const b = snap.data();
 
   if (b.code !== code) {
-    render(wrap, `<div class="card"><div class="content">❌ Invalid code</div></div>`);
+    wrap.innerHTML = `<div class="card"><div class="content">❌ Invalid code</div></div>`;
     return;
   }
 
@@ -54,7 +52,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const statusBadge = used ? `<div class="badge">USED</div>` : `<div class="badge">VALID</div>`;
   const actionBtn = used ? "" : `<button id="markUsedBtn" class="btn primary" style="width:100%; margin-top:10px;">Mark as Used</button>`;
 
-  render(wrap, `
+  wrap.innerHTML = `
     <div class="card">
       <div class="content" style="width:100%;">
         <div class="row">
@@ -71,7 +69,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         ${actionBtn}
       </div>
     </div>
-  `);
+  `;
 
   if (!used) {
     document.getElementById("markUsedBtn").addEventListener("click", async () => {
