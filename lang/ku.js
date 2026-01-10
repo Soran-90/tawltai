@@ -25,5 +25,11 @@ window.LANG_KU = {
   continue: "بەردەوام",
     total: "کۆی گشتی",
   pay: "پارەی پاراستن",
-
+  no_bookings: "هێشتا هیچ حجزێکت نیە",
+  status: "دۆخ",
+  type: "جۆر",
+  people: "کەس",
+  pay: "پارە",
+  currency_usd: "USD",
+  currency_iqd: "IQD",
 };
