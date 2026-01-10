@@ -1,3 +1,6 @@
+import { db } from "./firebase.js";
+import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
 function getQueryParam(name) {
   const url = new URL(window.location.href);
   return url.searchParams.get(name);
@@ -22,14 +25,8 @@ function usdToIqd(usd) {
   return Math.round(Number(usd || 0) * rate);
 }
 
-function moneyUSD(n) {
-  return `$${Number(n || 0).toFixed(2)}`;
-}
-
-function moneyIQDFromUSD(usd) {
-  const iqd = usdToIqd(usd);
-  return `${iqd.toLocaleString("en-US")} IQD`;
-}
+function moneyUSD(n) { return `$${Number(n || 0).toFixed(2)}`; }
+function moneyIQDFromUSD(usd) { return `${usdToIqd(usd).toLocaleString("en-US")} IQD`; }
 
 function calcPrice(ev, bookingType, people) {
   const base = ev.priceFromUSD || 0;
@@ -46,10 +43,15 @@ function calcPrice(ev, bookingType, people) {
   return { total, discountPercent, discount, finalTotal };
 }
 
+function makeCode() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let out = "TAW-";
+  for (let i = 0; i < 5; i++) out += chars[Math.floor(Math.random() * chars.length)];
+  return out;
+}
+
 function renderEvent(ev) {
   const wrap = document.getElementById("eventWrap");
-  if (!wrap) return;
-
   wrap.innerHTML = `
     <div class="card">
       <div class="thumb" style="width:100%; height:220px; background-image:url('${ev.img}')"></div>
@@ -72,7 +74,6 @@ function renderEvent(ev) {
 
 function setupBooking(ev) {
   let bookingType = "entry";
-
   const chips = Array.from(document.querySelectorAll("#book .chip[data-type]"));
   const peopleInput = document.getElementById("peopleCount");
   const priceLine = document.getElementById("priceLine");
@@ -90,50 +91,67 @@ function setupBooking(ev) {
 
     const parts = [];
     parts.push(`${t("total")}: ${moneyUSD(total)} (${moneyIQDFromUSD(total)})`);
-
-    if (discountPercent) {
-      parts.push(`${t("discount")}: ${discountPercent}% (-${moneyUSD(discount)})`);
-    }
-
+    if (discountPercent) parts.push(`${t("discount")}: ${discountPercent}% (-${moneyUSD(discount)})`);
     parts.push(`${t("final_pay")}: ${moneyUSD(finalTotal)} (${moneyIQDFromUSD(finalTotal)})`);
-
     priceLine.textContent = parts.join(" • ");
   }
 
   chips.forEach(c => c.addEventListener("click", () => setActive(c.getAttribute("data-type"))));
   peopleInput.addEventListener("input", updatePrice);
 
-  confirmBtn.addEventListener("click", () => {
+  confirmBtn.addEventListener("click", async () => {
+    confirmBtn.disabled = true;
+
     const people = Math.max(1, Number(peopleInput.value || 1));
     const price = calcPrice(ev, bookingType, people);
-    function makeCode() {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let out = "TAW-";
-  for (let i = 0; i < 5; i++) out += chars[Math.floor(Math.random() * chars.length)];
-  return out;
-}
-const code = makeCode();
 
-    const booking = {
-      id: "b_" + Date.now(),
+    const bookingId = "b_" + Date.now();
+    const code = makeCode();
+
+    const bookingDoc = {
+      id: bookingId,
       code,
       eventId: ev.id,
-      title: pickTitle(ev),
+      title_ar: ev.title_ar,
+      title_en: ev.title_en,
+      title_ku: ev.title_ku,
       venue: ev.venue,
+      city: ev.city,
       date: ev.date,
       time: ev.time,
       bookingType,
       people,
       finalTotalUSD: Number(price.finalTotal.toFixed(2)),
       status: "Pending",
-      createdAt: new Date().toISOString(),
+      used: false,
+      createdAt: serverTimestamp(),
     };
 
-    const existing = JSON.parse(localStorage.getItem("bookings") || "[]");
-    existing.unshift(booking);
-    localStorage.setItem("bookings", JSON.stringify(existing));
+    try {
+      await setDoc(doc(db, "bookings", bookingId), bookingDoc);
 
-    window.location.href = "my-bookings.html";
+      // لحد ما نضيف نظام حسابات، نخزن آخر حجز محلياً فقط للتصفح
+      const local = JSON.parse(localStorage.getItem("bookings") || "[]");
+      local.unshift({
+        id: bookingId,
+        code,
+        title: pickTitle(ev),
+        venue: ev.venue,
+        date: ev.date,
+        time: ev.time,
+        bookingType,
+        people,
+        finalTotalUSD: bookingDoc.finalTotalUSD,
+        status: "Pending",
+        eventId: ev.id
+      });
+      localStorage.setItem("bookings", JSON.stringify(local));
+
+      window.location.href = `booking.html?id=${encodeURIComponent(bookingId)}&v=1`;
+    } catch (e) {
+      alert("Firebase error: " + (e?.message || e));
+      confirmBtn.disabled = false;
+    }
   });
 
   setActive("entry");
@@ -144,12 +162,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const id = getQueryParam("id");
   const ev = (window.MOCK_EVENTS || []).find(x => x.id === id);
-
-  if (!ev) {
-    const wrap = document.getElementById("eventWrap");
-    if (wrap) wrap.innerHTML = `<div class="card"><div class="content">Event not found.</div></div>`;
-    return;
-  }
+  if (!ev) return;
 
   renderEvent(ev);
   setupBooking(ev);
