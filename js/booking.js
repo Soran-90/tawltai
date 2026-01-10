@@ -16,6 +16,18 @@ function moneyIQDFromUSD(usd) {
   return `${usdToIqd(usd).toLocaleString("en-US")} IQD`;
 }
 
+function renderQR(targetId, text) {
+  const el = document.getElementById(targetId);
+  if (!el || typeof QRCode === "undefined") return;
+
+  el.innerHTML = ""; // clear
+  new QRCode(el, {
+    text,
+    width: 180,
+    height: 180,
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   applyI18n();
 
@@ -28,6 +40,20 @@ document.addEventListener("DOMContentLoaded", () => {
     wrap.innerHTML = `<div class="card"><div class="content">Booking not found.</div></div>`;
     return;
   }
+
+  // النص الذي يدخل داخل QR
+  // مبدئيًا: كود + ID + معلومات مختصرة
+  const qrText = JSON.stringify({
+    app: "tawltai",
+    bookingId: b.id,
+    code: b.code,
+    eventId: b.eventId,
+    venue: b.venue,
+    date: b.date,
+    time: b.time,
+    people: b.people,
+    totalUSD: b.finalTotalUSD,
+  });
 
   wrap.innerHTML = `
     <div class="card">
@@ -44,7 +70,14 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="content" style="width:100%;">
             <div class="meta" style="opacity:1; font-weight:700;">Booking Code</div>
             <div style="font-size:28px; font-weight:800; letter-spacing:2px; margin-top:6px;">${b.code}</div>
-            <div class="meta" style="margin-top:6px;">Show this code at entry</div>
+
+            <div style="display:flex; gap:14px; align-items:center; margin-top:12px; flex-wrap:wrap;">
+              <div id="qrBox" style="background:#fff; padding:10px; border-radius:12px;"></div>
+              <div class="meta" style="max-width:260px;">
+                Scan the QR at entry.<br/>
+                If scan fails, use the code above.
+              </div>
+            </div>
           </div>
         </div>
 
@@ -56,4 +89,6 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     </div>
   `;
+
+  renderQR("qrBox", qrText);
 });
