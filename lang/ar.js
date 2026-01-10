@@ -23,4 +23,6 @@ window.LANG_AR = {
   vip: "VIP",
   people_count: "عدد الأشخاص",
   continue: "متابعة",
+    total: "المجموع",
+  pay: "المبلغ للدفع",
 };
