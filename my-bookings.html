@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tawltai - My Bookings</title>
+  <link rel="stylesheet" href="css/app.css" />
+
+  <script defer src="lang/ar.js"></script>
+  <script defer src="lang/ku.js"></script>
+  <script defer src="lang/en.js"></script>
+
+  <script defer src="js/i18n.js"></script>
+  <script defer src="js/bookings.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo"></div>
+      <div>
+        <div class="appname" data-i18n="app_name"></div>
+        <div class="city"><span data-i18n="city"></span></div>
+      </div>
+    </div>
+
+    <div class="lang">
+      <button class="chip" onclick="setLang('ar')">AR</button>
+      <button class="chip" onclick="setLang('ku')">KU</button>
+      <button class="chip" onclick="setLang('en')">EN</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="title" style="margin:10px 0;">🎟️ <span data-i18n="my_bookings"></span></div>
+    <div id="bookingsList" class="cards"></div>
+  </main>
+
+  <nav class="bottomnav">
+    <a class="navitem" href="index.html">🏠 <span data-i18n="events"></span></a>
+    <a class="navitem active" href="my-bookings.html">🎟️ <span data-i18n="my_bookings"></span></a>
+  </nav>
+</body>
+</html>
