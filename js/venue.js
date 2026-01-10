@@ -95,33 +95,61 @@ function renderList(docs) {
   });
 }
 
-function load() {
+ffunction load() {
   const venue = document.getElementById("venueSelect").value;
 
   if (unsubscribe) unsubscribe();
 
-  // base query: bookings for selected venue
-  let q = query(
-    collection(db, "bookings"),
+  const baseRef = collection(db, "bookings");
+
+  // (A) Query مع ترتيب — قد يحتاج Index
+  const q1 = query(
+    baseRef,
     where("venue", "==", venue),
     orderBy("date", "desc"),
     limit(50)
   );
 
-  unsubscribe = onSnapshot(q, (snap) => {
-    let rows = snap.docs.map(d => ({ id: d.id, data: d.data() }));
+  unsubscribe = onSnapshot(
+    q1,
+    (snap) => {
+      let rows = snap.docs.map(d => ({ id: d.id, data: d.data() }));
 
-    // local filtering
-    if (currentFilter === "today") {
-      rows = rows.filter(r => isToday(r.data.date));
-    } else if (currentFilter === "used") {
-      rows = rows.filter(r => !!r.data.used);
-    } else if (currentFilter === "valid") {
-      rows = rows.filter(r => !r.data.used);
+      if (currentFilter === "today") rows = rows.filter(r => isToday(r.data.date));
+      else if (currentFilter === "used") rows = rows.filter(r => !!r.data.used);
+      else if (currentFilter === "valid") rows = rows.filter(r => !r.data.used);
+
+      renderList(rows);
+    },
+    (err) => {
+      // إذا كان يحتاج index، نستخدم fallback بدون orderBy
+      alert("Firestore error: " + (err?.message || err));
+
+      const q2 = query(
+        baseRef,
+        where("venue", "==", venue),
+        limit(50)
+      );
+
+      if (unsubscribe) unsubscribe();
+      unsubscribe = onSnapshot(
+        q2,
+        (snap2) => {
+          let rows = snap2.docs.map(d => ({ id: d.id, data: d.data() }));
+
+          // ترتيب محلي بدل orderBy
+          rows.sort((a, b) => String(b.data.date || "").localeCompare(String(a.data.date || "")));
+
+          if (currentFilter === "today") rows = rows.filter(r => isToday(r.data.date));
+          else if (currentFilter === "used") rows = rows.filter(r => !!r.data.used);
+          else if (currentFilter === "valid") rows = rows.filter(r => !r.data.used);
+
+          renderList(rows);
+        },
+        (err2) => alert("Firestore fallback error: " + (err2?.message || err2))
+      );
     }
-
-    renderList(rows);
-  });
+  );
 }
 
 document.addEventListener("DOMContentLoaded", () => {
