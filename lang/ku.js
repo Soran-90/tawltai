@@ -23,4 +23,7 @@ window.LANG_KU = {
   vip: "VIP",
   people_count: "ژمارەی کەس",
   continue: "بەردەوام",
+    total: "کۆی گشتی",
+  pay: "پارەی پاراستن",
+
 };
