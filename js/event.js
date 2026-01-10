@@ -1,6 +1,14 @@
 import { db } from "./firebase.js";
 import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
+// Safety checks (prevents blank UI)
+if (typeof window.MOCK_EVENTS === "undefined") {
+  alert("data.js not loaded (MOCK_EVENTS missing). Check event.html script order.");
+}
+if (typeof window.applyI18n !== "function") {
+  alert("i18n.js not loaded (applyI18n missing). Check event.html script order.");
+}
+
 function getQueryParam(name) {
   const url = new URL(window.location.href);
   return url.searchParams.get(name);
