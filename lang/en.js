@@ -23,4 +23,7 @@ window.LANG_EN = {
   vip: "VIP",
   people_count: "People",
   continue: "Continue",
+    total: "Total",
+  pay: "Pay",
+
 };
