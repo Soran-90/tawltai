@@ -17,11 +17,21 @@ function pickDesc(ev) {
   return ev.description_en;
 }
 
+function usdToIqd(usd) {
+  const rate = (window.APP_SETTINGS && window.APP_SETTINGS.usdToIqd) ? window.APP_SETTINGS.usdToIqd : 1310;
+  return Math.round(Number(usd || 0) * rate);
+}
+
+function moneyUSD(n) {
+  return `$${Number(n || 0).toFixed(2)}`;
+}
+
+function moneyIQDFromUSD(usd) {
+  const iqd = usdToIqd(usd);
+  return `${iqd.toLocaleString("en-US")} IQD`;
+}
+
 function calcPrice(ev, bookingType, people) {
-  // MVP pricing (simple):
-  // entry = base
-  // table = base * people * 1.5
-  // vip   = base * people * 2.2
   const base = ev.priceFromUSD || 0;
   const p = Math.max(1, Number(people) || 1);
 
@@ -29,7 +39,6 @@ function calcPrice(ev, bookingType, people) {
   if (bookingType === "table") total = base * p * 1.5;
   if (bookingType === "vip") total = base * p * 2.2;
 
-  // discount only if exists
   const discountPercent = Number(ev.discountPercent || 0);
   const discount = discountPercent ? (total * discountPercent / 100) : 0;
   const finalTotal = Math.max(0, total - discount);
@@ -47,13 +56,15 @@ function renderEvent(ev) {
       <div class="content" style="width:100%;">
         <div class="row">
           <div class="title">${pickTitle(ev)}</div>
-          ${ev.discountPercent ? `<div class="badge">${t("discount_badge")} ${ev.discountPercent}%</div>` : ""}
+          ${ev.discountPercent ? `<div class="badge">${t("discount")} ${ev.discountPercent}%</div>` : ""}
         </div>
         <div class="meta"><b>${t("venue")}:</b> ${ev.venue}</div>
         <div class="meta"><b>${t("date")}:</b> ${ev.date}</div>
         <div class="meta"><b>${t("time")}:</b> ${ev.time}</div>
         <div class="meta" style="margin-top:8px;"><b>${t("description")}:</b> ${pickDesc(ev)}</div>
-        <div class="price" style="margin-top:10px;">${t("price_from")} $${ev.priceFromUSD}</div>
+        <div class="price" style="margin-top:10px;">
+          ${t("price_from")} ${moneyUSD(ev.priceFromUSD)} (${moneyIQDFromUSD(ev.priceFromUSD)})
+        </div>
       </div>
     </div>
   `;
@@ -77,11 +88,16 @@ function setupBooking(ev) {
     const people = Number(peopleInput.value || 1);
     const { total, discountPercent, discount, finalTotal } = calcPrice(ev, bookingType, people);
 
-    const discountText = discountPercent
-      ? ` • ${t("discount_badge")} ${discountPercent}% (-$${discount.toFixed(2)})`
-      : "";
+    const parts = [];
+    parts.push(`${t("total")}: ${moneyUSD(total)} (${moneyIQDFromUSD(total)})`);
 
-    priceLine.textContent = `Total: $${total.toFixed(2)}${discountText}  =>  Pay: $${finalTotal.toFixed(2)}`;
+    if (discountPercent) {
+      parts.push(`${t("discount")}: ${discountPercent}% (-${moneyUSD(discount)})`);
+    }
+
+    parts.push(`${t("final_pay")}: ${moneyUSD(finalTotal)} (${moneyIQDFromUSD(finalTotal)})`);
+
+    priceLine.textContent = parts.join(" • ");
   }
 
   chips.forEach(c => c.addEventListener("click", () => setActive(c.getAttribute("data-type"))));
@@ -130,7 +146,6 @@ document.addEventListener("DOMContentLoaded", () => {
   renderEvent(ev);
   setupBooking(ev);
 
-  // If user clicked Book Now, jump to booking section
   if (window.location.hash === "#book") {
     document.getElementById("book")?.scrollIntoView({ behavior: "smooth" });
   }
