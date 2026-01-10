@@ -32,4 +32,8 @@ window.LANG_EN = {
   pay: "Pay",
   currency_usd: "USD",
   currency_iqd: "IQD",
+    total: "Total",
+  discount: "Discount",
+  final_pay: "Amount to pay",
+
 };
