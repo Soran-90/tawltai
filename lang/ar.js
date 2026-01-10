@@ -25,4 +25,12 @@ window.LANG_AR = {
   continue: "متابعة",
     total: "المجموع",
   pay: "المبلغ للدفع",
+    no_bookings: "ما عندك حجوزات لحد الآن",
+  status: "الحالة",
+  type: "النوع",
+  people: "الأشخاص",
+  pay: "المبلغ",
+  currency_usd: "دولار",
+  currency_iqd: "دينار",
+
 };
