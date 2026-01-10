@@ -24,7 +24,6 @@ function usdToIqd(usd) {
   const rate = (window.APP_SETTINGS && window.APP_SETTINGS.usdToIqd) ? window.APP_SETTINGS.usdToIqd : 1310;
   return Math.round(Number(usd || 0) * rate);
 }
-
 function moneyUSD(n) { return `$${Number(n || 0).toFixed(2)}`; }
 function moneyIQDFromUSD(usd) { return `${usdToIqd(usd).toLocaleString("en-US")} IQD`; }
 
@@ -130,7 +129,7 @@ function setupBooking(ev) {
     try {
       await setDoc(doc(db, "bookings", bookingId), bookingDoc);
 
-      // لحد ما نضيف نظام حسابات، نخزن آخر حجز محلياً فقط للتصفح
+      // مؤقتًا حتى "حجوزاتي" تبقى شغالة بدون نظام حسابات:
       const local = JSON.parse(localStorage.getItem("bookings") || "[]");
       local.unshift({
         id: bookingId,
