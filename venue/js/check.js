@@ -1,4 +1,4 @@
-import { db, auth } from "./firebase.js";
+import { db, auth } from "../../shared/js/firebase.js";
 import {
   doc,
   getDoc,

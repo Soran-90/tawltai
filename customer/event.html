@@ -4,25 +4,18 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Tawltai - Event</title>
-  <link rel="stylesheet" href="css/app.css" />
+  <link rel="stylesheet" href="../shared/css/app.css">
 
-  <script defer src="lang/ar.js"></script>
-  <script defer src="lang/ku.js"></script>
-  <script defer src="lang/en.js"></script>
+<script defer src="../shared/lang/ar.js"></script>
+<script defer src="../shared/lang/ku.js"></script>
+<script defer src="../shared/lang/en.js"></script>
 
-  <script defer src="js/i18n.js"></script>
-<script defer src="js/data.js"></script>
-<script defer src="js/settings.js"></script>
-  <script>
-  window.addEventListener("error", (e) => {
-    alert("JS error: " + (e.message || e.error));
-  });
-  window.addEventListener("unhandledrejection", (e) => {
-    alert("Promise error: " + (e.reason?.message || e.reason));
-  });
-</script>
+<script defer src="../shared/js/i18n.js"></script>
+<script defer src="../shared/js/settings.js"></script>
+<script defer src="../shared/js/data.js"></script>
 
-<script type="module" src="js/event.js"></script>
+<script type="module" src="./js/event.js"></script>
+
 </head>
 <body>
   <header class="topbar">

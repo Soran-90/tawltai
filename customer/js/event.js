@@ -1,4 +1,4 @@
-import { db } from "./firebase.js";
+import { db, auth } from "../../shared/js/firebase.js";
 import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
 // === helpers to access globals loaded by defer scripts ===
