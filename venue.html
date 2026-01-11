@@ -12,6 +12,11 @@
 
   <script defer src="js/i18n.js"></script>
   <script defer src="js/settings.js"></script>
+  <script>
+  window.addEventListener("error", (e) => alert("JS error: " + (e.message || e.error)));
+  window.addEventListener("unhandledrejection", (e) => alert("Promise error: " + (e.reason?.message || e.reason)));
+</script>
+
   <script type="module" src="js/venue.js"></script>
 </head>
 <body>
