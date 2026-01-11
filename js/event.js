@@ -1,6 +1,5 @@
 import { db } from "./firebase.js";
 import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-alert("event.js loaded");
 
 // === helpers to access globals loaded by defer scripts ===
 const applyI18n = (...a) => globalThis.applyI18n?.(...a);
