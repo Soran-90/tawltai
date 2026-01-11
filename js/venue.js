@@ -1,13 +1,20 @@
-import { db } from "./firebase.js";
+import { db, auth } from "./firebase.js";
 import {
   collection,
   onSnapshot,
   doc,
+  getDoc,
   updateDoc,
-  serverTimestamp
+  serverTimestamp,
+  query,
+  where
 } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
-alert("venue.js loaded");
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 
 const getLang = () => globalThis.getLang ? globalThis.getLang() : "ar";
 
@@ -25,43 +32,14 @@ function pickTitleFromDoc(d) {
   return d.title_en || d.title_ar || d.title_ku || "Event";
 }
 
-let currentFilter = "all";
-let cache = [];
+let unsubscribe = null;
+let venueName = null;
 
-function isToday(dateStr) {
-  const now = new Date();
-  const y = now.getFullYear();
-  const m = String(now.getMonth() + 1).padStart(2, "0");
-  const d = String(now.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}` === dateStr;
-}
-
-function setFilter(f) {
-  currentFilter = f;
-  document.querySelectorAll(".chip[data-filter]").forEach(b =>
-    b.classList.toggle("active", b.dataset.filter === f)
-  );
-  render();
-}
-
-function render() {
-  const venue = document.getElementById("venueSelect")?.value || "";
+function renderBookings(rows) {
   const root = document.getElementById("venueList");
 
-  let rows = cache.filter(r => r.data.venue === venue);
-
-  if (currentFilter === "today") rows = rows.filter(r => isToday(r.data.date));
-  if (currentFilter === "used") rows = rows.filter(r => r.data.used);
-  if (currentFilter === "valid") rows = rows.filter(r => !r.data.used);
-
   if (!rows.length) {
-    root.innerHTML = `
-      <div class="card">
-        <div class="content">
-          No bookings for <b>${venue}</b><br/>
-          Total in Firestore: <b>${cache.length}</b>
-        </div>
-      </div>`;
+    root.innerHTML = `<div class="card"><div class="content">No bookings for <b>${venueName}</b></div></div>`;
     return;
   }
 
@@ -74,7 +52,7 @@ function render() {
         </div>
         <div class="meta">${data.date} • ${data.time}</div>
         <div class="meta">Code: <b>${data.code}</b></div>
-        <div class="meta">People: ${data.people}</div>
+        <div class="meta">People: ${data.people} • Type: ${data.bookingType}</div>
         <div class="price">
           ${moneyUSD(data.finalTotalUSD)} (${moneyIQDFromUSD(data.finalTotalUSD)})
         </div>
@@ -93,16 +71,75 @@ function render() {
   });
 }
 
+async function loadVenueForUser(uid) {
+  const snap = await getDoc(doc(db, "venues", uid));
+  if (!snap.exists()) return null;
+  return snap.data()?.venueName || null;
+}
+
+function subscribeBookings() {
+  if (!venueName) return;
+
+  if (unsubscribe) unsubscribe();
+
+  const q = query(collection(db, "bookings"), where("venue", "==", venueName));
+  unsubscribe = onSnapshot(q, (snap) => {
+    const rows = snap.docs.map(d => ({ id: d.id, data: d.data() }));
+    renderBookings(rows);
+  });
+}
+
+function setAuthUI(loggedIn) {
+  document.getElementById("loginBtn").style.display = loggedIn ? "none" : "block";
+  document.getElementById("logoutBtn").style.display = loggedIn ? "block" : "none";
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   globalThis.applyI18n?.();
 
-  document.getElementById("venueSelect")?.addEventListener("change", render);
-  document.querySelectorAll(".chip[data-filter]").forEach(btn =>
-    btn.addEventListener("click", () => setFilter(btn.dataset.filter))
-  );
+  const msg = document.getElementById("authMsg");
 
-  onSnapshot(collection(db, "bookings"), snap => {
-    cache = snap.docs.map(d => ({ id: d.id, data: d.data() }));
-    render();
+  document.getElementById("loginBtn").onclick = async () => {
+    msg.textContent = "";
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (e) {
+      msg.textContent = e?.message || e;
+    }
+  };
+
+  document.getElementById("logoutBtn").onclick = async () => {
+    await signOut(auth);
+  };
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      setAuthUI(false);
+      venueName = null;
+      document.getElementById("venueList").innerHTML = `<div class="card"><div class="content">Please login.</div></div>`;
+      if (unsubscribe) unsubscribe();
+      return;
+    }
+
+    setAuthUI(true);
+
+    venueName = await loadVenueForUser(user.uid);
+    if (!venueName) {
+      document.getElementById("venueList").innerHTML =
+        `<div class="card"><div class="content">No venue assigned to this account.</div></div>`;
+      return;
+    }
+
+    // نخفي اختيار venue اليدوي (صار مرتبط بالحساب)
+    const select = document.getElementById("venueSelect");
+    if (select) {
+      select.value = venueName;
+      select.disabled = true;
+    }
+
+    subscribeBookings();
   });
 });
