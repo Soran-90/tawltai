@@ -63,10 +63,22 @@ function renderBookings(rows) {
 
   document.querySelectorAll("[data-id]").forEach(btn => {
     btn.onclick = async () => {
-      await updateDoc(doc(db, "bookings", btn.dataset.id), {
-        used: true,
-        usedAt: serverTimestamp()
-      });
+      const entered = prompt("Enter venue PIN:");
+if (!entered) return;
+
+const venueSnap = await getDoc(doc(db, "venues", auth.currentUser.uid));
+const pin = venueSnap.exists() ? venueSnap.data()?.pin : null;
+
+if (!pin || String(entered) !== String(pin)) {
+  alert("Wrong PIN");
+  return;
+}
+
+await updateDoc(doc(db, "bookings", btn.dataset.id), {
+  used: true,
+  usedAt: serverTimestamp(),
+  usedBy: auth.currentUser.uid
+});
     };
   });
 }
