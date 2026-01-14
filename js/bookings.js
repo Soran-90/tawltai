@@ -43,12 +43,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         <div class="meta">
           ${t("type")}: ${typeLabel(b.bookingType)} • ${t("people")}: ${b.people}
-        </a>
+        </div>
 
         <div class="price" style="margin-top:8px;">
           ${t("pay")}: ${formatMoneyUSD(b.finalTotalUSD)} (${formatMoneyIQDFromUSD(b.finalTotalUSD)})
         </div>
       </div>
-    </div>
+    </a>
   `).join("");
 });
