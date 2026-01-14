@@ -1,5 +1,6 @@
-import { db, auth } from "../../shared/js/firebase.js";
+import { db } from "../../shared/js/firebase.js";
 import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+import { ensureAuth } from "../../shared/js/auth.js";
 
 // === helpers to access globals loaded by defer scripts ===
 const applyI18n = (...a) => globalThis.applyI18n?.(...a);
@@ -108,32 +109,34 @@ function setupBooking(ev) {
   confirmBtn.addEventListener("click", async () => {
     confirmBtn.disabled = true;
 
-    const people = Math.max(1, Number(peopleInput.value || 1));
-    const price = calcPrice(ev, bookingType, people);
-
-    const bookingId = "b_" + Date.now();
-    const code = makeCode();
-
-    const bookingDoc = {
-      id: bookingId,
-      code,
-      eventId: ev.id,
-      title_ar: ev.title_ar,
-      title_en: ev.title_en,
-      title_ku: ev.title_ku,
-      venue: ev.venue,
-      city: ev.city,
-      date: ev.date,
-      time: ev.time,
-      bookingType,
-      people,
-      finalTotalUSD: Number(price.finalTotal.toFixed(2)),
-      status: "Pending",
-      used: false,
-      createdAt: serverTimestamp(),
-    };
-
     try {
+      const people = Math.max(1, Number(peopleInput.value || 1));
+      const price = calcPrice(ev, bookingType, people);
+      const user = await ensureAuth();
+
+      const bookingId = "b_" + Date.now();
+      const code = makeCode();
+
+      const bookingDoc = {
+        id: bookingId,
+        userId: user.uid,
+        code,
+        eventId: ev.id,
+        title_ar: ev.title_ar,
+        title_en: ev.title_en,
+        title_ku: ev.title_ku,
+        venue: ev.venue,
+        city: ev.city,
+        date: ev.date,
+        time: ev.time,
+        bookingType,
+        people,
+        finalTotalUSD: Number(price.finalTotal.toFixed(2)),
+        status: "Pending",
+        used: false,
+        createdAt: serverTimestamp(),
+      };
+
       await setDoc(doc(db, "bookings", bookingId), bookingDoc);
 
       // مؤقتًا (بدون حسابات): نخزن محلي حتى تظهر بـ "حجوزاتي"
