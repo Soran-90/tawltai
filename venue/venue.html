@@ -1,9 +1,10 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Tawltai - Venue Dashboard</title>
+
   <link rel="stylesheet" href="../shared/css/app.css" />
 
   <script defer src="../shared/lang/ar.js"></script>
@@ -12,13 +13,19 @@
 
   <script defer src="../shared/js/i18n.js"></script>
   <script defer src="../shared/js/settings.js"></script>
-  <script>
-  window.addEventListener("error", (e) => alert("JS error: " + (e.message || e.error)));
-  window.addEventListener("unhandledrejection", (e) => alert("Promise error: " + (e.reason?.message || e.reason)));
-</script>
 
-  <script type="module" src="../venue/js/venue.js"></script>
+  <!-- Debug alerts (only in github.dev / codespaces) -->
+  <script>
+    if (location.hostname.includes("github.dev")) {
+      window.addEventListener("error", (e) => alert("JS error: " + (e.message || e.error)));
+      window.addEventListener("unhandledrejection", (e) => alert("Promise error: " + (e.reason?.message || e.reason)));
+    }
+  </script>
+
+  <!-- ✅ Correct path (venue/venue.html -> venue/js/venue.js) -->
+  <script type="module" defer src="./js/venue.js"></script>
 </head>
+
 <body>
   <header class="topbar">
     <div class="brand">
@@ -37,36 +44,54 @@
   </header>
 
   <main class="container">
+
+    <!-- Auth card -->
     <div id="authCard" class="card">
-  <div class="content" style="width:100%;">
-    <div class="row">
-      <div class="title">🔐 Login</div>
+      <div class="content" style="width:100%;">
+        <div class="row">
+          <div class="title">🔐 Login</div>
+        </div>
+
+        <input id="email" class="search" type="email" placeholder="Email" style="margin-top:10px;">
+        <input id="password" class="search" type="password" placeholder="Password" style="margin-top:10px;">
+
+        <button id="loginBtn" class="btn primary" style="width:100%; margin-top:10px;">Login</button>
+        <button id="logoutBtn" class="btn" style="width:100%; margin-top:10px; display:none;">Logout</button>
+
+        <div id="authMsg" class="meta" style="margin-top:10px;"></div>
+      </div>
     </div>
 
-    <input id="email" class="search" type="email" placeholder="Email" style="margin-top:10px;">
-    <input id="password" class="search" type="password" placeholder="Password" style="margin-top:10px;">
-
-    <button id="loginBtn" class="btn primary" style="width:100%; margin-top:10px;">Login</button>
-    <button id="logoutBtn" class="btn" style="width:100%; margin-top:10px; display:none;">Logout</button>
-
-    <div id="authMsg" class="meta" style="margin-top:10px;"></div>
-  </div>
-</div>
-
+    <!-- Venue dashboard -->
     <div class="card">
       <div class="content" style="width:100%;">
         <div class="row">
           <div class="title">🏢 Venue</div>
         </div>
+
+        <!-- Controls (manual select - can be hidden later by JS after login) -->
+        <div id="venueControls">
+          <div class="meta" style="margin-top:6px;">اختر القاعة/المكان (مؤقتًا يدوي)</div>
+
+          <select id="venueSelect" class="search" style="margin-top:10px;">
+            <option value="Sky Club">Sky Club</option>
+            <option value="Divan Erbil">Divan Erbil</option>
+          </select>
+
+          <div class="filters" style="margin-top:10px;">
+            <button class="chip active" data-filter="all">All</button>
+            <button class="chip" data-filter="today">Today</button>
+            <button class="chip" data-filter="valid">Valid</button>
+            <button class="chip" data-filter="used">Used</button>
+          </div>
+        </div>
+
+        <!-- List -->
         <div id="venueList" class="cards" style="margin-top:12px;"></div>
 
-        <div class="meta" style="margin-top:6px;">اختر القاعة/المكان (مؤقتًا يدوي)</div>
-        <select id="venueSelect" class="search" style="margin-top:10px;">
-          <option value="Sky Club">Sky Club</option>
-          <option value="Divan Erbil">Divan Erbil</option>
-        </select>
+      </div>
+    </div>
 
-        <div class="filters" style="margin-top:10px;">
-          <button class="chip active" data-filter="all">All</button>
-          <button class="chip" data-filter="today">Today</button>
-          <button class="chip" data-filte
+  </main>
+</body>
+</html>
