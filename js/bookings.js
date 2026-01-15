@@ -78,9 +78,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
           <div class="meta">${b.venue || "-"}</div>
           <div class="meta">${b.date || "-"} • ${b.time || "-"}</div>
-        <div class="meta">
-          ${t("type")}: ${typeLabel(b.bookingType)} • ${t("people")}: ${b.people}
-        </div>
 
           <div class="meta">
             ${t("type")}: ${typeLabel(b.bookingType)} • ${t("people")}: ${b.people || 0}
@@ -95,7 +92,4 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   loadBookings().then(renderBookings);
-      </div>
-    </a>
-  `).join("");
 });
