@@ -1,5 +1,13 @@
+import { db } from "../../shared/js/firebase.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+import { ensureAuth } from "../../shared/js/auth.js";
+
+const applyI18n = (...a) => globalThis.applyI18n?.(...a);
+const t = (k) => globalThis.t ? globalThis.t(k) : k;
+const getLang = () => globalThis.getLang ? globalThis.getLang() : "ar";
+
 function getQueryParam(name) {
-  const url = new URL(window.location.href);
+  const url = new URL(globalThis.location.href);
   return url.searchParams.get(name);
 }
 
@@ -34,23 +42,49 @@ document.addEventListener("DOMContentLoaded", () => {
   const bookingId = getQueryParam("id");
   const wrap = document.getElementById("bookingWrap");
   const list = JSON.parse(localStorage.getItem("bookings") || "[]");
-  const b = list.find(x => x.id === bookingId);
 
-  if (!b) {
-    wrap.innerHTML = `<div class="card"><div class="content">Booking not found.</div></div>`;
-    return;
+  async function loadBooking() {
+    try {
+      await ensureAuth();
+      const snap = await getDoc(doc(db, "bookings", bookingId));
+      if (!snap.exists()) return null;
+      const data = snap.data();
+      return data;
+    } catch (e) {
+      console.warn("Failed to load booking from Firestore:", e);
+      return null;
+    }
   }
 
-  // النص الذي يدخل داخل QR
-  // مبدئيًا: كود + ID + معلومات مختصرة
-  const base = location.origin + location.pathname.replace("booking.html", "");
-const qrText = `${base}check.html?id=${encodeURIComponent(b.id)}&code=${encodeURIComponent(b.code)}`;
+  function pickTitle(b) {
+    if (b.title) return b.title;
+    const lang = getLang();
+    if (lang === "ar") return b.title_ar || b.title_en || b.title_ku || "Event";
+    if (lang === "ku") return b.title_ku || b.title_en || b.title_ar || "Event";
+    return b.title_en || b.title_ar || b.title_ku || "Event";
+  }
 
-  wrap.innerHTML = `
+  function resolveBookingSource(b) {
+    if (b) return b;
+    return list.find(x => x.id === bookingId) || null;
+  }
+
+  loadBooking().then((fetched) => {
+    const b = resolveBookingSource(fetched);
+    if (!b) {
+      wrap.innerHTML = `<div class="card"><div class="content">Booking not found.</div></div>`;
+      return;
+    }
+
+    const qrUrl = new URL("../venue/check.html", globalThis.location.href);
+    qrUrl.searchParams.set("id", b.id);
+    qrUrl.searchParams.set("code", b.code);
+
+    wrap.innerHTML = `
     <div class="card">
       <div class="content" style="width:100%;">
         <div class="row">
-          <div class="title">${b.title}</div>
+          <div class="title">${pickTitle(b)}</div>
           <div class="badge">${b.status}</div>
         </div>
 
@@ -72,14 +106,15 @@ const qrText = `${base}check.html?id=${encodeURIComponent(b.id)}&code=${encodeUR
           </div>
         </div>
 
-        <div class="meta" style="margin-top:12px;">Type: ${b.bookingType} • People: ${b.people}</div>
+        <div class="meta" style="margin-top:12px;">${t("type")}: ${b.bookingType} • ${t("people")}: ${b.people}</div>
 
         <div class="price" style="margin-top:10px;">
-          Pay: ${moneyUSD(b.finalTotalUSD)} (${moneyIQDFromUSD(b.finalTotalUSD)})
+          ${t("pay")}: ${moneyUSD(b.finalTotalUSD)} (${moneyIQDFromUSD(b.finalTotalUSD)})
         </div>
       </div>
     </div>
   `;
 
-  renderQR("qrBox", qrText);
+    renderQR("qrBox", qrUrl.toString());
+  });
 });
