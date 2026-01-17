@@ -22,8 +22,8 @@ function renderEvents(list) {
         <div class="price">${t("price_from")} $${ev.priceFromUSD}</div>
 
         <div class="actions">
-          <a class="btn" href="event.html?id=${encodeURIComponent(ev.id)}">${t("view_details")}</a>
-          <a class="btn primary" href="event.html?id=${encodeURIComponent(ev.id)}#book">${t("book_now")}</a>
+          <a class="btn" href="customer/event.html?id=${encodeURIComponent(ev.id)}">${t("view_details")}</a>
+          <a class="btn primary" href="customer/event.html?id=${encodeURIComponent(ev.id)}#book">${t("book_now")}</a>
         </div>
       </div>
     </div>
