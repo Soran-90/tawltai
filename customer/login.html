@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tawltai - Login</title>
+  <link rel="stylesheet" href="../shared/css/app.css" />
+  <script defer src="../shared/lang/ar.js"></script>
+  <script defer src="../shared/lang/ku.js"></script>
+  <script defer src="../shared/lang/en.js"></script>
+  <script defer src="../shared/js/i18n.js"></script>
+  <script type="module" src="./js/login.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo"></div>
+      <div>
+        <div class="appname" data-i18n="app_name"></div>
+        <div class="city" data-i18n="my_profile"></div>
+      </div>
+    </div>
+    <div class="lang">
+      <button class="chip" onclick="setLang('ar')">AR</button>
+      <button class="chip" onclick="setLang('ku')">KU</button>
+      <button class="chip" onclick="setLang('en')">EN</button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- Logged-in view -->
+    <div id="loggedInView" style="display:none;">
+      <div class="success-banner" style="margin-top:20px;">
+        <div class="big">👤</div>
+        <div class="success-title" id="welcomeMsg"></div>
+      </div>
+
+      <div class="card" style="margin-top:10px;">
+        <div class="content" style="width:100%;">
+          <div class="meta" id="userEmailDisplay" style="margin-bottom:14px;"></div>
+          <div class="meta" id="userTypeDisplay" style="margin-bottom:14px;"></div>
+
+          <a class="btn" href="./my-bookings.html" style="display:block; text-align:center; margin-bottom:10px;">
+            🎟️ <span data-i18n="my_bookings"></span>
+          </a>
+          <button id="logoutBtn" class="btn danger" style="width:100%;" data-i18n="logout"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Auth forms (logged out) -->
+    <div id="authView">
+
+      <!-- Tabs -->
+      <div class="filters" style="margin-top:16px; margin-bottom:0;">
+        <button class="chip active" id="tabLogin" data-i18n="login"></button>
+        <button class="chip" id="tabRegister" data-i18n="register"></button>
+      </div>
+
+      <!-- Login form -->
+      <div id="formLogin" class="card" style="margin-top:10px;">
+        <div class="content" style="width:100%;">
+          <div class="title" style="margin-bottom:14px;">🔐 <span data-i18n="login"></span></div>
+
+          <div class="form-group">
+            <label class="form-label" data-i18n="email"></label>
+            <input id="loginEmail" class="search" type="email" autocomplete="email" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="password"></label>
+            <input id="loginPassword" class="search" type="password" autocomplete="current-password" />
+          </div>
+
+          <div id="loginMsg" class="meta" style="color:#f87171; margin-bottom:8px;"></div>
+          <button id="loginBtn" class="btn primary" style="width:100%;" data-i18n="login"></button>
+        </div>
+      </div>
+
+      <!-- Register form -->
+      <div id="formRegister" class="card" style="margin-top:10px; display:none;">
+        <div class="content" style="width:100%;">
+          <div class="title" style="margin-bottom:14px;">✨ <span data-i18n="register"></span></div>
+
+          <div class="form-group">
+            <label class="form-label" data-i18n="email"></label>
+            <input id="regEmail" class="search" type="email" autocomplete="email" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="password"></label>
+            <input id="regPassword" class="search" type="password" autocomplete="new-password" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="confirm_password"></label>
+            <input id="regPassword2" class="search" type="password" autocomplete="new-password" />
+          </div>
+
+          <div id="regMsg" class="meta" style="color:#f87171; margin-bottom:8px;"></div>
+          <button id="registerBtn" class="btn primary" style="width:100%;" data-i18n="register"></button>
+        </div>
+      </div>
+
+      <!-- Guest note -->
+      <div class="auth-banner" style="margin-top:14px;">
+        <div class="meta" style="opacity:1; margin-bottom:8px;" data-i18n="login_to_save"></div>
+        <a class="btn" href="./my-bookings.html" style="display:block; text-align:center;" data-i18n="skip_login"></a>
+      </div>
+
+    </div>
+
+  </main>
+
+  <nav class="bottomnav">
+    <a class="navitem" href="../index.html">
+      <span class="nav-icon">🏠</span>
+      <span data-i18n="events"></span>
+    </a>
+    <a class="navitem" href="./my-bookings.html">
+      <span class="nav-icon">🎟️</span>
+      <span data-i18n="my_bookings"></span>
+    </a>
+    <a class="navitem active" href="./login.html">
+      <span class="nav-icon">👤</span>
+      <span data-i18n="my_profile"></span>
+    </a>
+  </nav>
+</body>
+</html>

@@ -5,17 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Tawltai - Event</title>
   <link rel="stylesheet" href="../shared/css/app.css">
-
-<script defer src="../shared/lang/ar.js"></script>
-<script defer src="../shared/lang/ku.js"></script>
-<script defer src="../shared/lang/en.js"></script>
-
-<script defer src="../shared/js/i18n.js"></script>
-<script defer src="../shared/js/settings.js"></script>
-<script defer src="../shared/js/data.js"></script>
-
-<script type="module" src="./js/event.js"></script>
-
+  <script defer src="../shared/lang/ar.js"></script>
+  <script defer src="../shared/lang/ku.js"></script>
+  <script defer src="../shared/lang/en.js"></script>
+  <script defer src="../shared/js/i18n.js"></script>
+  <script defer src="../shared/js/settings.js"></script>
+  <script defer src="../shared/js/data.js"></script>
+  <script type="module" src="./js/event.js"></script>
 </head>
 <body>
   <header class="topbar">
@@ -26,7 +22,6 @@
         <div class="city"><span data-i18n="city"></span></div>
       </div>
     </div>
-
     <div class="lang">
       <button class="chip" onclick="setLang('ar')">AR</button>
       <button class="chip" onclick="setLang('ku')">KU</button>
@@ -43,28 +38,70 @@
       <div class="content" style="width:100%;">
         <div class="title" style="margin-bottom:10px;">📝 <span data-i18n="book_now"></span></div>
 
-        <label class="meta" data-i18n="booking_type"></label>
-        <div class="filters" style="margin-top:8px;">
-          <button class="chip active" data-type="entry" data-i18n="entry"></button>
-          <button class="chip" data-type="table" data-i18n="table"></button>
-          <button class="chip" data-type="vip" data-i18n="vip"></button>
+        <!-- Step 1: Type + People -->
+        <div id="bookStep1">
+          <label class="meta" data-i18n="booking_type"></label>
+          <div class="filters" style="margin-top:8px;">
+            <button class="chip active" data-type="entry" data-i18n="entry"></button>
+            <button class="chip" data-type="table" data-i18n="table"></button>
+            <button class="chip" data-type="vip" data-i18n="vip"></button>
+          </div>
+
+          <label class="meta" style="display:block; margin-top:10px;" data-i18n="people_count"></label>
+          <input id="peopleCount" class="search" type="number" min="1" value="2" style="margin-top:6px;" />
+
+          <div class="meta" id="priceLine" style="margin-top:10px; line-height:1.8;"></div>
+
+          <button id="confirmBtn" class="btn primary" style="width:100%; margin-top:12px;">
+            <span data-i18n="continue"></span> →
+          </button>
         </div>
 
-        <label class="meta" style="display:block; margin-top:10px;" data-i18n="people_count"></label>
-        <input id="peopleCount" class="search" type="number" min="1" value="2" />
+        <!-- Step 2: Payment -->
+        <div id="bookStep2" style="display:none;">
+          <div id="step2summary" style="margin-bottom:14px;"></div>
 
-        <div class="meta" id="priceLine" style="margin-top:10px;"></div>
+          <div class="title" style="margin-bottom:12px;">💳 <span data-i18n="payment_title"></span></div>
 
-        <button id="confirmBtn" class="btn primary" style="width:100%; margin-top:10px;">
-          <span data-i18n="continue"></span>
-        </button>
+          <div class="payment-option selected" data-payment="cash">
+            <div class="payment-option-title">💵 <span data-i18n="pay_cash"></span></div>
+            <div class="payment-option-desc" data-i18n="pay_cash_desc"></div>
+          </div>
+
+          <div class="payment-option disabled" data-payment="card">
+            <div class="payment-option-title">💳 <span data-i18n="pay_card"></span></div>
+            <div class="payment-option-desc" data-i18n="pay_card_desc"></div>
+          </div>
+
+          <div class="meta" style="margin:10px 0; color:#fbbf24;">
+            ℹ️ <span data-i18n="payment_note"></span>
+          </div>
+
+          <div style="display:flex; gap:10px; margin-top:14px;">
+            <button id="backToStep1Btn" class="btn" style="min-width:80px;">← <span data-i18n="back"></span></button>
+            <button id="finalConfirmBtn" class="btn primary" style="flex:1;">
+              ✓ <span data-i18n="confirm_booking"></span>
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
   </main>
 
   <nav class="bottomnav">
-    <a class="navitem" href="../index.html">🏠 <span data-i18n="events"></span></a>
-    <a class="navitem" href="../customer/my-bookings.html">🎟️ <span data-i18n="my_bookings"></span></a>
+    <a class="navitem" href="../index.html">
+      <span class="nav-icon">🏠</span>
+      <span data-i18n="events"></span>
+    </a>
+    <a class="navitem" href="../customer/my-bookings.html">
+      <span class="nav-icon">🎟️</span>
+      <span data-i18n="my_bookings"></span>
+    </a>
+    <a class="navitem" href="../customer/login.html">
+      <span class="nav-icon">👤</span>
+      <span data-i18n="my_profile"></span>
+    </a>
   </nav>
 </body>
 </html>
