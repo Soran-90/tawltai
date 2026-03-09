@@ -1,0 +1,80 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper functions ──────────────────────────────────────────
+    function isLoggedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isLoggedIn() &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    function isOwner(userId) {
+      return isLoggedIn() && request.auth.uid == userId;
+    }
+
+    // ── Events collection ─────────────────────────────────────────
+    // Anyone can read active events
+    // Only admins can create, update, delete
+    match /events/{eventId} {
+      allow read: if resource.data.active == true || isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ── Bookings collection ───────────────────────────────────────
+    // Users can read their own bookings
+    // Users can create bookings (linked to their UID)
+    // Users can update only status (cancel)
+    // Venue staff and admins can read all and mark as used
+    match /bookings/{bookingId} {
+      allow read: if isLoggedIn() &&
+        (isOwner(resource.data.userId) || isAdmin() || isVenueStaff());
+
+      allow create: if isLoggedIn() &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.status == "Pending";
+
+      allow update: if isLoggedIn() && (
+        // Owner can cancel
+        (isOwner(resource.data.userId) &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status", "cancelledAt"])) ||
+        // Venue staff/admin can mark as used
+        isAdmin() ||
+        isVenueStaff()
+      );
+
+      allow delete: if isAdmin();
+    }
+
+    // ── Venues collection ─────────────────────────────────────────
+    // Venue staff can read their venue
+    // Only admins can write
+    match /venues/{venueId} {
+      allow read: if isLoggedIn();
+      allow write: if isAdmin();
+    }
+
+    // ── Admins collection ─────────────────────────────────────────
+    // Only admins can read/write (to check admin status)
+    match /admins/{uid} {
+      allow read: if isLoggedIn() && request.auth.uid == uid;
+      allow write: if isAdmin();
+    }
+
+    // ── Helper: venue staff check ─────────────────────────────────
+    function isVenueStaff() {
+      return isLoggedIn() &&
+        exists(/databases/$(database)/documents/venueStaff/$(request.auth.uid));
+    }
+
+    // ── Venue staff collection ────────────────────────────────────
+    match /venueStaff/{uid} {
+      allow read: if isLoggedIn() && request.auth.uid == uid;
+      allow write: if isAdmin();
+    }
+
+  }
+}

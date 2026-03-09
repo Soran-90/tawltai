@@ -1,0 +1,198 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tawltai - Admin</title>
+  <link rel="stylesheet" href="../shared/css/app.css" />
+
+  <script defer src="../shared/lang/ar.js"></script>
+  <script defer src="../shared/lang/ku.js"></script>
+  <script defer src="../shared/lang/en.js"></script>
+  <script defer src="../shared/js/i18n.js"></script>
+  <script defer src="../shared/js/settings.js"></script>
+
+  <script type="module" src="./js/admin.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo"></div>
+      <div>
+        <div class="appname">طاولتي</div>
+        <div class="city" id="adminSubtitle">Admin Panel</div>
+      </div>
+    </div>
+    <div class="lang">
+      <button class="chip" onclick="setLang('ar')">AR</button>
+      <button class="chip" onclick="setLang('ku')">KU</button>
+      <button class="chip" onclick="setLang('en')">EN</button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- Login section -->
+    <div id="loginSection">
+      <div class="card" style="margin-top:20px;">
+        <div class="content" style="width:100%;">
+          <div class="title" style="margin-bottom:16px;">🔐 <span data-i18n="admin_login"></span></div>
+
+          <div class="form-group">
+            <label class="form-label" data-i18n="email"></label>
+            <input id="adminEmail" class="search" type="email" placeholder="admin@tawltai.com" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="password"></label>
+            <input id="adminPassword" class="search" type="password" placeholder="••••••••" />
+          </div>
+
+          <button id="loginBtn" class="btn primary" style="width:100%; margin-top:8px;" data-i18n="login"></button>
+          <div id="loginMsg" class="meta" style="margin-top:10px; color:#f87171;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard section (hidden until login) -->
+    <div id="dashboardSection" style="display:none;">
+
+      <!-- Top bar with logout -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <div class="title" data-i18n="admin_panel"></div>
+        <button id="logoutBtn" class="btn danger" style="font-size:12px;" data-i18n="logout"></button>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+          <div class="stat-value" id="statEvents">-</div>
+          <div class="stat-label" data-i18n="stats_events"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statBookings">-</div>
+          <div class="stat-label" data-i18n="stats_bookings"></div>
+        </div>
+      </div>
+
+      <!-- Add event button -->
+      <button id="addEventBtn" class="btn primary" style="width:100%; margin-bottom:14px;">
+        ＋ <span data-i18n="add_event"></span>
+      </button>
+
+      <!-- Events list -->
+      <div class="title" style="margin-bottom:10px;" data-i18n="events_list"></div>
+      <div id="adminEventsList">
+        <div class="loading-wrap" data-i18n="loading"></div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Event Form Modal -->
+  <div id="eventModal" class="modal-overlay" style="display:none;">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle"></div>
+        <button class="modal-close" id="modalCloseBtn">✕</button>
+      </div>
+
+      <input type="hidden" id="formEventId" />
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" data-i18n="event_type"></label>
+          <select id="formType" class="search">
+            <option value="nightclub">Nightclub</option>
+            <option value="concert">Concert</option>
+            <option value="party">Party</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="event_city"></label>
+          <input id="formCity" class="search" type="text" placeholder="Erbil" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" data-i18n="event_venue"></label>
+        <input id="formVenue" class="search" type="text" placeholder="Sky Club" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" data-i18n="event_title_ar"></label>
+        <input id="formTitleAr" class="search" type="text" placeholder="برنامج الليلة..." />
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="event_title_en"></label>
+        <input id="formTitleEn" class="search" type="text" placeholder="Tonight Program..." />
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="event_title_ku"></label>
+        <input id="formTitleKu" class="search" type="text" placeholder="پڕۆگرامی ئەم شەوە..." />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" data-i18n="event_date"></label>
+          <input id="formDate" class="search" type="date" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="event_time"></label>
+          <input id="formTime" class="search" type="time" value="22:00" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" data-i18n="event_price"></label>
+          <input id="formPrice" class="search" type="number" min="0" placeholder="20" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="event_discount"></label>
+          <input id="formDiscount" class="search" type="number" min="0" max="100" placeholder="0" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" data-i18n="event_capacity"></label>
+        <input id="formCapacity" class="search" type="number" min="0" placeholder="200" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" data-i18n="event_img"></label>
+        <input id="formImg" class="search" type="url" placeholder="https://..." />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" data-i18n="event_desc_ar"></label>
+        <textarea id="formDescAr" class="search" placeholder="الوصف بالعربي..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="event_desc_en"></label>
+        <textarea id="formDescEn" class="search" placeholder="Description in English..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="event_desc_ku"></label>
+        <textarea id="formDescKu" class="search" placeholder="وەسف بە کوردی..."></textarea>
+      </div>
+
+      <div class="form-check" style="margin-bottom:16px;">
+        <label class="toggle">
+          <input type="checkbox" id="formActive" checked />
+          <span class="toggle-slider"></span>
+        </label>
+        <span class="form-label" style="margin:0;" data-i18n="event_active"></span>
+      </div>
+
+      <div id="formMsg" class="meta" style="margin-bottom:10px; color:#f87171;"></div>
+
+      <div style="display:flex; gap:10px;">
+        <button id="saveEventBtn" class="btn primary" style="flex:1;" data-i18n="save"></button>
+        <button id="cancelFormBtn" class="btn" data-i18n="cancel"></button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
